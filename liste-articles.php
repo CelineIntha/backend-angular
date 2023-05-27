@@ -2,10 +2,14 @@
 
 include 'header-json.php';
 
-try {
-    require 'bdd.php';
+try{
 
-    $requete = $bdd->prepare("SELECT * from article");
+    include 'bdd.php';
+
+    $requete = $bdd->prepare(
+        "SELECT a.id ,a.nom, a.prix, a.contenu , a.date ,a.promotion, a.id_categorie ,c.nom as nom_categorie 
+         FROM article a
+         LEFT JOIN categorie c ON a.id_categorie = c.id");
 
     $requete->execute();
 

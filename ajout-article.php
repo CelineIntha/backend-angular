@@ -13,12 +13,13 @@ try{
 
         if($utilisateurConnecte['admin'] == 1) {
 
-            $requete = $bdd->prepare("INSERT INTO article (nom, contenu, date)
-                                        VALUES (:nom, :contenu,  NOW() )");
+            $requete = $bdd->prepare("INSERT INTO article (nom, contenu, date, id_categorie)
+                                        VALUES (:nom, :contenu,  NOW() , :id_categorie)");
 
             $requete->execute([
                 "nom" => $donneesFormulaire["nom"],
-                "contenu" => $donneesFormulaire["contenu"]
+                "contenu" => $donneesFormulaire["contenu"],
+                "id_categorie" => $donneesFormulaire["id_categorie"]
             ]);
 
             echo '{"message" : "L\'article a été ajouté"}';

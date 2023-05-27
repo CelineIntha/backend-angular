@@ -2,28 +2,28 @@
 
 include 'header-json.php';
 
-// permet de récuperer le corps de la requête
 $json = file_get_contents('php://input');
-
-// permet de transformer le json en objet PHP
-// c'est un tableau associatif
 $donneesFormulaire = json_decode($json, TRUE);
 
-try {
-    require 'bdd.php';
+try{
+    
+    include 'bdd.php';
 
-    $requete = $bdd->prepare("SELECT * FROM utilisateur
-       WHERE email = :email
-       AND password = :password");
+    $requete = $bdd->prepare("SELECT * 
+                                FROM utilisateur 
+                                WHERE email = :email");
 
     $requete->execute([
-        "email" => $donneesFormulaire["email"],
-        "password" => $donneesFormulaire["password"]
+        "email" => $donneesFormulaire["email"]
     ]);
 
     $utilisateur = $requete->fetch();
 
-    if ($utilisateur) {
+    if($utilisateur && password_verify(
+        $donneesFormulaire["password"],
+        $utilisateur['password'])
+    ) {
+       
         // Étape 1 : Créer le Header
         $header = json_encode([
             'typ' => 'JWT',
@@ -33,6 +33,7 @@ try {
         // Étape 2 : Créer le Payload (les données que vous voulez stocker)
         $payload = json_encode([
             'email' => $donneesFormulaire["email"],
+            'admin' => $utilisateur["admin"]
         ]);
 
         // Étape 3 : Encoder le Header et le Payload en base64Url
@@ -48,9 +49,14 @@ try {
         $jwt = $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
 
         echo "{ \"jwt\" : \"$jwt\" }";
-    }
 
-} catch (PDOException $e) {
+
+    } else {
+        $erreur = ["message" => "utilisateur inconnu"];
+        echo json_encode($erreur);
+    }
+}
+catch (PDOException $e) {
     echo 'Echec de la connexion : ' . $e->getMessage();
     exit;
 }

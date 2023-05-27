@@ -14,12 +14,13 @@ try{
         if($utilisateurConnecte['admin'] == 1) {
 
             $requete = $bdd->prepare("UPDATE article 
-                                        SET nom = :nom, contenu = :contenu
+                                        SET nom = :nom, contenu = :contenu, id_categorie = :id_categorie
                                         WHERE id = :id");
 
             $requete->execute([
                 "nom" => $donneesFormulaire["nom"],
                 "contenu" => $donneesFormulaire["contenu"],
+                "id_categorie" => $donneesFormulaire["id_categorie"],
                 "id" => $donneesFormulaire["id"]
             ]);
 
